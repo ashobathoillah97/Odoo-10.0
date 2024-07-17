@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="service_team_tree_view" model="ir.ui.view">
+        <field name="name">service.team.tree</field>
+        <field name="model">service.team</field>
+        <field name="arch" type="xml">
+            <tree string="Service Team">
+                <field name="name"/>
+                <field name="leader_id"/>
+                <field name="member_ids"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="booking_order_tree" model="ir.ui.view">
+        <field name="name">booking.order.tree</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree string="Booking Order">
+                <field name="name" string="Order Number"/>
+                <field name="team_id"/>
+                <field name="date_order"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="amount_total" sum="Total Tax Included" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="invoice_status"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="booking_order_view_form">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="team_id"/>
+                <field name="leader_id"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <field name="member_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="check" string="Check"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="object"
+                        class="oe_stat_button"
+                        id="work_order_button"
+                        icon="fa-calendar-o"
+                        name="open_work_order">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_text">Work Order</span>
+                        </div>
+                    </button>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="booking_start_date"/>
+                <field name="booking_end_date"/>
+                <field name="is_booking_order"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_booking_order_tree_view" model="ir.actions.act_window">
+        <field name="name">Booking Order</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="booking_order_tree"/>
+        <field name="domain">[('is_booking_order','=',True)]</field>
+    </record>
+
+    <record id="action_service_team_tree_view" model="ir.actions.act_window">
+        <field name="name">Service Team</field>
+        <field name="res_model">service.team</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="service_team_tree_view"/>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem id="menu_booking" name="Booking" parent="sales_team.menu_base_partner" sequence="7"/>
+    <menuitem name="Booking Order" id="menu_booking_order_tree" parent="menu_booking" action="action_booking_order_tree_view" sequence="25"/>
+    <menuitem name="Service Team" id="menu_service_team_tree" parent="menu_booking" action="action_service_team_tree_view" sequence="27"/>
+
+
+
+</odoo>
